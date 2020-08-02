@@ -19,13 +19,20 @@ module.exports = {
     Good : Good,
 
     //create an instance of Good (document) and save to collection
-    createGood : function(g){
-        Good.create(g, (err) => {
+    createGood : (g) => {
+        return Good.create(g, (err) => {
             if(err){
                 console.log(err);
                 return err;
             }
         });
+    },
+
+    //find good by name and return document
+    findGood : (goodName) => {
+        return Good.findOne({
+            name: goodName
+        }).exec();
     }
 
 };
