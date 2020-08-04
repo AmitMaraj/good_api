@@ -98,7 +98,7 @@ app.get('/goods', [
 //get details for a good
 app.get('/good/:id', async (req, res) => {
     if(!req.params.id)
-        res.status(200).json({'status':'error', 'msg':'good id is required'});
+        res.status(200).json({'status':'error', 'msg':'param: id is required for good'});
     
     try {
         var g = await GoodModel.findGoodById(req.params.id);
@@ -108,6 +108,7 @@ app.get('/good/:id', async (req, res) => {
 
     if(g != null)
         return res.status(200).json({'status':'success', 'msg':'good found', 'good': g});
+    return res.status(200).json({'status':'error', 'msg':'good not found'});
     
 });
 

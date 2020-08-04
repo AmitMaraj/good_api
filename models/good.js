@@ -25,7 +25,6 @@ module.exports = {
     createGood : (g) => {
         return Good.create(g, (err) => {
             if(err){
-                console.log(err);
                 return err;
             }
         });
@@ -48,14 +47,12 @@ module.exports = {
     },
 
     findGoods : async (page_number, page_length) => {
-        let r;
         return Good.paginate({}, {
             page: page_number,
             limit: page_length
         }).then( result => {
             console.log('results: '+result.docs);
-            r = result.docs;
-            return r;
+            return result.docs;
         });
     }
 
