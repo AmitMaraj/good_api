@@ -38,6 +38,15 @@ module.exports = {
         }).exec();
     },
 
+    findGoodById : async (id) => {
+        return Good.findById(id, (err, g) => {
+            if(err)
+                return err;
+            console.log('found good: ' + g);
+            return g;
+        });
+    },
+
     findGoods : async (page_number, page_length) => {
         let r;
         return Good.paginate({}, {

@@ -69,7 +69,7 @@ app.post('/good/create', [
 
         var result = GoodModel.createGood(g);
         if(result === false)
-            res.status(400).json('error: could not save good to database');
+            res.status(200).json('error: could not save good to database');
         res.status(200).json({status: 'success', msg: 'good created successfully', 'id':g._id});
     }
 });
@@ -93,6 +93,22 @@ app.get('/goods', [
         var goods = await GoodModel.findGoods(req.query.page_number, req.query.page_length);
         return res.status(200).json({'status':'success', 'goods':goods});
     }
+});
+
+//get details for a good
+app.get('/good/:id', async (req, res) => {
+    if(!req.params.id)
+        res.status(200).json({'status':'error', 'msg':'good id is required'});
+    
+    try {
+        var g = await GoodModel.findGoodById(req.params.id);
+    } catch (error) {
+        return res.status(200).json({'status':'error', 'msg':'good not found'});
+    }
+
+    if(g != null)
+        return res.status(200).json({'status':'success', 'msg':'good found', 'good': g});
+    
 });
 
 app.listen(port, hostname, () => {
