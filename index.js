@@ -3,7 +3,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const {
     body,
-    validationResult
+    validationResult,
+    check
 } = require('express-validator');
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -70,6 +71,27 @@ app.post('/good/create', [
         if(result === false)
             res.status(400).json('error: could not save good to database');
         res.status(200).json({status: 'success', msg: 'good created successfully', 'id':g._id});
+    }
+});
+
+//returns a paginated list of goods
+app.get('/goods', [
+    check('page_number').isInt({min: 1}).withMessage('param: page_number is required. page_number starts at 1'),
+    check('page_length').isInt({min: 0, max: 11}).withMessage('param: page_length must be between 1 and 10 inclusive')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        var array = [];
+        errors.array().forEach(element => {
+            array.push(element.msg);
+        });
+        return res.status(400).json({
+            errors: array
+        });
+    }
+    else{
+        var goods = await GoodModel.findGoods(req.query.page_number, req.query.page_length);
+        return res.status(200).json({'status':'success', 'goods':goods});
     }
 });
 
