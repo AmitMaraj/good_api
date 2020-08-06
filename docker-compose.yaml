@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+
+  app:
+    container_name: nodejs_server
+    restart: on-failure:5
+    build: .
+    ports:
+      [3000:3000]
+    depends_on:
+      - mongo
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      [27017:27017]
+    # volumes:
+    #   - /data/mongodb/db:/data/db

@@ -6,7 +6,7 @@ const {
     validationResult,
     check
 } = require('express-validator');
-const hostname = '127.0.0.1';
+const hostname = '0.0.0.0';
 const port = 3000;
 
 const GoodModel = require('./models/good.js');

@@ -2,7 +2,7 @@ var MongoClient = require('mongodb').MongoClient;
 const mongoose = require('mongoose');
 const mongoose_db = mongoose.connection;
 
-var url = "mongodb://127.0.0.1:27017/goodDB";
+var url = "mongodb://mongo:27017/goodDB";
 
 var GoodModel = require('./models/good.js');
 
