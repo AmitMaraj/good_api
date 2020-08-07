@@ -98,18 +98,93 @@ app.get('/goods', [
 //get details for a good
 app.get('/good/:id', async (req, res) => {
     if(!req.params.id)
-        res.status(200).json({'status':'error', 'msg':'param: id is required for good'});
+        res.status(400).json({'status':'error', 'msg':'param: id is required for good'});
     
     try {
         var g = await GoodModel.findGoodById(req.params.id);
     } catch (error) {
-        return res.status(200).json({'status':'error', 'msg':'good not found'});
+        return res.status(500).json({'status':'error', 'msg':'good not found'});
     }
-
-    if(g != null)
+    
+    if(g != null && g != 'error')
         return res.status(200).json({'status':'success', 'msg':'good found', 'good': g});
     return res.status(200).json({'status':'error', 'msg':'good not found'});
     
+});
+
+//update good by id and return updated good
+app.post('/good/update', [
+    body('id').not().isEmpty().withMessage("param: id is required").isLength({min: 1}).custom( value => {
+        return GoodModel.findGoodById(value).then(g => {
+            console.log('find good'+g);
+            if (g == null || g == undefined)
+                return Promise.reject('good id not found');
+            return Promise.resolve();
+        });
+    }),
+    body('name').isLength({min: 1}).custom(value => {
+        if(value.length == 0)
+            return Promise.reject('param: name required');
+        //check if good name already exist in db
+        return GoodModel.findGood(value).then( g => {
+            if (g != null)
+                return Promise.reject('a good with this name already exist');
+            return Promise.resolve();
+        });
+    }),
+    body('description').isLength({min: 1}).withMessage('param: description required'),
+    body('price').isFloat({gt: 0}).withMessage('param: price must be more than 0'),
+    body('rating').isInt({min: 1, max: 5}).withMessage('param: rating must be between 1 and 5'),
+    body('date_last_purchased').isISO8601().withMessage('param: date_last_purchased is not ISO8601 format'),
+    body('days_since_purchased').isInt({min:0}).withMessage('param: days_since_purchased required')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        var array = [];
+        errors.array().forEach(element => {
+            array.push(element.msg);
+        });
+        return res.status(400).json({
+            errors: array
+        });
+    }
+    else
+        try {
+            var g = await GoodModel.updateGood(req.body.id, {
+                name: req.body.name,
+                description: req.body.description,
+                price: req.body.price,
+                rating: req.body.rating,
+                date_last_purchased: req.body.date_last_purchased,
+                days_since_purchased: req.body.days_since_purchased,
+                updated_at: new Date().toISOString()
+            });
+        } catch (error) {
+            return res.status(500).json({'status':'error', 'msg':'good not updated. Error: ' + error});
+        }
+    if (g != null)
+        return res.status(200).json({'status':'success', 'msg':'good updated', 'good': g});
+    return res.status(200).json({'status':'error', 'msg':'good not updated'});
+});
+
+//delete good
+app.delete('/good/delete/:id', async (req, res) => {
+    if(!req.params.id)
+        res.status(400).json({'status':'error', 'msg':'param: id is required for good'});
+    else{
+        try {
+            var g = await GoodModel.findGoodById(req.params.id);
+            if(g == null || g == undefined)
+                return res.status(200).json({'status':'error', 'msg':'good not found. cannot delete'});
+            else
+                g = await GoodModel.deleteGood(req.params.id);
+        } catch (error) {
+            return res.status(500).json({'status':'error', 'msg':'good not deleted. Error: ' + error});
+        }
+        if(g == null)
+            return res.status(200).json({'status':'success', 'msg':'good deleted'});
+        return res.status(200).json({'status':'error', 'msg':'good not deleted'});
+    }
 });
 
 app.listen(port, hostname, () => {

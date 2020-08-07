@@ -9,7 +9,9 @@ const good = new Schema({
     price: Number,
     rating: Number,
     date_last_purchased: Date,
-    days_since_purchased: Number
+    days_since_purchased: Number,
+    created_at: { type: Date, default: Date.now },
+    updated_at: { type: Date, default: null }
 });
 
 good.plugin(mongoosePaginate);
@@ -37,22 +39,39 @@ module.exports = {
         }).exec();
     },
 
+    //find good by id
     findGoodById : async (id) => {
         return Good.findById(id, (err, g) => {
+            console.log('error: '+err);
             if(err)
-                return err;
-            console.log('found good: ' + g);
+                return 'error';
             return g;
         });
     },
 
+    //return a paginate list of goods
     findGoods : async (page_number, page_length) => {
         return Good.paginate({}, {
             page: page_number,
             limit: page_length
         }).then( result => {
-            console.log('results: '+result.docs);
             return result.docs;
+        });
+    },
+
+    //update good by id
+    updateGood : async (id, g) => {
+        return Good.findByIdAndUpdate(id, g, {new: true}, (err, result) => {
+            if(err)
+                return err;
+        });
+    },
+
+    //delete good
+    deleteGood : async (id) => {
+        return Good.findByIdAndDelete(id, (err, res) => {
+            if(err)
+                return err;
         });
     }
 
