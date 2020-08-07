@@ -116,7 +116,6 @@ app.get('/good/:id', async (req, res) => {
 app.post('/good/update', [
     body('id').not().isEmpty().withMessage("param: id is required").isLength({min: 1}).custom( value => {
         return GoodModel.findGoodById(value).then(g => {
-            console.log('find good'+g);
             if (g == null || g == undefined)
                 return Promise.reject('good id not found');
             return Promise.resolve();

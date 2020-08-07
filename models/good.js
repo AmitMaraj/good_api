@@ -42,7 +42,6 @@ module.exports = {
     //find good by id
     findGoodById : async (id) => {
         return Good.findById(id, (err, g) => {
-            console.log('error: '+err);
             if(err)
                 return 'error';
             return g;
