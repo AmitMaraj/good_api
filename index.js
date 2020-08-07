@@ -54,6 +54,7 @@ app.post('/good/create', [
             array.push(element.msg);
         });
         return res.status(400).json({
+            'status': 'error',
             errors: array
         });
     }
@@ -69,7 +70,7 @@ app.post('/good/create', [
 
         var result = GoodModel.createGood(g);
         if(result === false)
-            res.status(200).json('error: could not save good to database');
+            res.status(200).json({'status':'error', 'msg': 'could not save good to database'});
         res.status(200).json({status: 'success', msg: 'good created successfully', 'id':g._id});
     }
 });
@@ -86,6 +87,7 @@ app.get('/goods', [
             array.push(element.msg);
         });
         return res.status(400).json({
+            'status': 'error',
             errors: array
         });
     }
@@ -144,6 +146,7 @@ app.post('/good/update', [
             array.push(element.msg);
         });
         return res.status(400).json({
+            'status': 'error',
             errors: array
         });
     }
